@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FindCeemti - Achados e Perdidos</title>
+<style>
+:root{--y:#ffc400;--yl:#fff3c4;--k:#151515;--br:#8a4b12;--ok:#16a36a;--bad:#e5484d;--mu:#6f675c;--ln:#efe4cf}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,Arial,sans-serif}
+body{background:#fffaf0;color:#1b1b1b;min-height:100vh}
+.hidden{display:none!important}
+.logo{font-size:32px;font-weight:900;text-align:center}
+.logo em{font-style:normal;background:var(--y);padding:0 10px;border-radius:10px}
+button{font-weight:800;cursor:pointer;border:none;border-radius:12px;padding:11px 16px;font-size:14px}
+input,textarea,select{width:100%;padding:11px;border:2px solid var(--ln);border-radius:12px;font-size:15px;background:#fffdf7}
+label{display:block;font-size:13px;font-weight:700;color:var(--br);margin:10px 0 4px}
+.erro{color:var(--bad);font-size:13px;min-height:18px;margin-top:8px}
+.ok{color:var(--ok);font-size:12px;margin-top:10px;text-align:center}
+/* login */
+#login{min-height:100vh;display:grid;place-items:center;padding:20px;background:#fff0b8}
+.lb{background:#fff;width:100%;max-width:420px;border-radius:22px;padding:24px;border-top:8px solid var(--y);box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.role{display:block;width:100%;text-align:left;background:#fffdf7;border:2px solid var(--ln);padding:14px;border-radius:14px;margin-top:10px;font-size:16px}
+.role small{display:block;color:var(--mu);font-weight:600;font-size:13px}
+.role:hover{border-color:var(--y)}
+.main{background:var(--y);color:var(--k);width:100%;border:2px solid var(--k);margin-top:10px}
+/* app */
+.top{background:var(--k);color:var(--y);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-weight:800}
+.top span.p{background:#2b2b2b;color:#fff;padding:5px 12px;border-radius:99px;font-size:13px;margin-right:8px}
+.top button{background:var(--y);color:var(--k);border-radius:99px;padding:7px 14px}
+.wrap{max-width:1000px;margin:0 auto;padding:16px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#fff;border-radius:14px;padding:14px;border-bottom:4px solid var(--y);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.stat strong{display:block;font-size:24px}
+.stat span{font-size:12px;color:var(--mu)}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{flex:1;background:#fff;border:2px solid var(--ln);color:var(--mu)}
+.tab.on{background:var(--k);color:var(--y);border-color:var(--k)}
+.panel{background:#fff;border-radius:16px;padding:18px;margin-bottom:16px;border:1px solid var(--ln);box-shadow:0 4px 12px rgba(0,0,0,.06)}
+.panel h2{font-size:18px;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:0 12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.chip{background:#fff;border:2px solid var(--ln);color:var(--mu);border-radius:99px;padding:7px 14px}
+.chip.on{background:var(--k);color:var(--y);border-color:var(--k)}
+.filtros{display:flex;gap:8px;flex-wrap:wrap}
+.filtros>*{flex:1;min-width:150px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.item{background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--ln);border-top:6px solid var(--y);box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.item.enc{border-top-color:var(--ok);background:#f1fbf6}
+.item img{width:100%;height:150px;object-fit:cover;display:block}
+.ib{padding:14px;display:grid;gap:8px}
+.it{display:flex;justify-content:space-between;gap:8px}
+.it h3{font-size:16px;overflow-wrap:anywhere}
+.badge{font-size:11px;font-weight:800;text-transform:uppercase;padding:4px 9px;border-radius:99px;height:fit-content}
+.bp{background:var(--k);color:var(--y)}
+.be{background:#d3f3e4;color:#0b7a4f}
+.cat{background:var(--yl);color:var(--br);font-size:12px;font-weight:700;padding:3px 10px;border-radius:99px;width:fit-content}
+.info{font-size:13px;color:var(--mu);display:grid;gap:4px;overflow-wrap:anywhere}
+.acts{display:flex;gap:6px;flex-wrap:wrap;border-top:2px dashed var(--ln);padding-top:10px}
+.acts button{flex:1;font-size:13px;padding:8px}
+.b1{background:var(--ok);color:#fff}
+.b2{background:#f6e7d6;color:var(--br)}
+.b3{background:var(--yl);color:var(--br)}
+.b4{background:#ffe5e6;color:var(--bad)}
+.empty{grid-column:1/-1;text-align:center;padding:30px;border:2px dashed var(--y);border-radius:14px;color:var(--mu)}
+/* chat */
+.msgs{height:380px;overflow-y:auto;background:#fffdf7;border:2px solid var(--ln);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px}
+.msg{max-width:80%;padding:8px 12px;border-radius:12px;background:#fff;border:1px solid var(--ln);align-self:flex-start;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--yl)}
+.msg small{display:block;font-size:11px;color:var(--mu)}
+.msg .adm{color:var(--bad)}
+.cbar{display:flex;gap:8px;margin-top:10px}
+.cbar button{background:var(--y);color:var(--k);border:2px solid var(--k);width:100px}
+.nota{font-size:12px;color:var(--mu);margin-top:8px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--k);color:var(--y);padding:11px 18px;border-radius:99px;font-weight:700;display:none;z-index:50}
+@media(max-width:600px){.stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="lb">
+    <div class="logo">Find<em>Ceemti</em></div>
+    <p style="text-align:center;color:#6f675c;font-size:14px;margin:6px 0 10px">Escolha como você quer entrar.</p>
+    <label for="nome">Seu nome (opcional)</label>
+    <input id="nome" maxlength="30" placeholder="Ex.: Maria (3º A)" onkeydown="if(event.key==='Enter')entrar(false)">
+    <button type="button" class="role" onclick="entrar(false)">🎒 <b>Sou Estudante</b><small>Entrar sem senha</small></button>
+    <button type="button" class="role" onclick="abrirSenha()">🔐 <b>Sou Administrador</b><small>Entrar com senha</small></button>
+    <div id="boxSenha" class="hidden">
+      <label for="senha">Senha de administrador</label>
+      <input id="senha" type="password" placeholder="Digite a senha" onkeydown="if(event.key==='Enter')loginAdmin()">
+      <button type="button" class="main" onclick="loginAdmin()">Entrar como administrador</button>
+    </div>
+    <p class="erro" id="erro"></p>
+    <p class="ok" id="okjs"></p>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <div class="top">
+    <span>🔎 FindCeemti</span>
+    <div><span class="p" id="papel"></span><button type="button" onclick="sair()">Sair</button></div>
+  </div>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><strong id="sT">0</strong><span>📦 Total de itens</span></div>
+      <div class="stat"><strong id="sP">0</strong><span>❓ Ainda perdidos</span></div>
+      <div class="stat"><strong id="sE">0</strong><span>✅ Encontrados</span></div>
+    </div>
+
+    <div class="tabs">
+      <button type="button" class="tab on" id="tItens" onclick="aba('itens')">📋 Itens</button>
+      <button type="button" class="tab" id="tChat" onclick="aba('chat')">💬 Chat <span id="novas"></span></button>
+    </div>
+
+    <div id="vItens">
+      <div class="panel">
+        <h2>➕ Registrar item perdido</h2>
+        <div class="grid">
+          <div><label for="fNome">Item</label><input id="fNome" placeholder="Ex.: Garrafa azul"></div>
+          <div><label for="fCat">Categoria</label><select id="fCat"></select></div>
+          <div><label for="fLocal">Onde foi perdido</label><input id="fLocal" placeholder="Ex.: Quadra"></div>
+          <div><label for="fData">Data</label><input id="fData" type="date"></div>
+          <div><label for="fContato">Contato</label><input id="fContato" placeholder="Nome / turma"></div>
+          <div><label for="fFoto">Foto (opcional)</label><input id="fFoto" type="file" accept="image/*"></div>
+        </div>
+        <label for="fDesc">Descrição</label>
+        <textarea id="fDesc" rows="3" placeholder="Cor, marca, detalhes..."></textarea>
+        <button type="button" class="main" onclick="adicionar()">Registrar</button>
+      </div>
+
+      <div class="panel">
+        <h2>Itens</h2>
+        <div class="filtros">
+          <select id="fCatFiltro" onchange="render()"></select>
+          <input id="busca" type="search" placeholder="Buscar..." oninput="render()">
+        </div>
+        <div class="chips">
+          <button type="button" class="chip on" id="c-todos" onclick="setFiltro('todos')">Todos</button>
+          <button type="button" class="chip" id="c-perdido" onclick="setFiltro('perdido')">Perdidos</button>
+          <button type="button" class="chip" id="c-encontrado" onclick="setFiltro('encontrado')">Encontrados</button>
+        </div>
+        <div class="items" id="lista"></div>
+        <div id="adminTools" class="hidden" style="margin-top:14px"><button type="button" class="b2" onclick="exportar()">⬇ Exportar dados</button></div>
+      </div>
+    </div>
+
+    <div id="vChat" class="hidden">
+      <div class="panel">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h2 style="margin:0">💬 Chat geral</h2>
+          <button type="button" class="b4 hidden" id="bLimpa" onclick="limparChat()">🗑 Limpar chat</button>
+        </div>
+        <div class="msgs" id="msgs"></div>
+        <div class="cbar">
+          <input id="cTxt" maxlength="300" placeholder="Escreva uma mensagem..." onkeydown="if(event.key==='Enter')enviar()">
+          <button type="button" onclick="enviar()">Enviar</button>
+        </div>
+        <p class="nota">As mensagens ficam salvas neste navegador. Para conversar entre aparelhos diferentes seria preciso um servidor.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var SENHA_ADMIN = "admin123"; // TROQUE a senha aqui
+var CATS = ["Roupas","Material escolar","Eletrônicos","Garrafas e lancheiras","Documentos","Outros"];
+var isAdmin = false, usuario = "", filtro = "todos", abaAtual = "itens";
+var itens = [], chat = [], lidas = 0, mem = {};
+
+function $(id){ return document.getElementById(id); }
+function ler(k, d){
+  try { var v = localStorage.getItem(k); if (v) return JSON.parse(v); } catch(e){}
+  return mem[k] || d;
+}
+function gravar(k, v){
+  mem[k] = v;
+  try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e){ return false; }
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {"&":"&","<":"<",">":">",'"':""","'":"'"}[c];
+  });
+}
+function toast(m){
+  var t = $("toast"); t.textContent = m; t.style.display = "block";
+  setTimeout(function(){ t.style.display = "none"; }, 2200);
+}
+function fmtData(d){
+  if (!d) return "—";
+  var p = d.split("-");
+  return p.length === 3 ? p[2] + "/" + p[1] + "/" + p[0] : d;
+}
+
+/* ---- login ---- */
+function abrirSenha(){
+  $("boxSenha").classList.remove("hidden");
+  $("senha").focus();
+}
+function loginAdmin(){
+  if ($("senha").value === SENHA_ADMIN){ $("senha").value = ""; entrar(true); }
+  else { $("erro").textContent = "Senha incorreta."; }
+}
+function entrar(admin){
+  usuario = $("nome").value.replace(/^\s+|\s+$/g, "") || (admin ? "Administrador" : "Estudante");
+  isAdmin = admin;
+  $("erro").textContent = "";
+  $("login").classList.add("hidden");
+  $("app").classList.remove("hidden");
+  $("papel").textContent = (admin ? "🔐 " : "🎒 ") + usuario;
+  if (admin){ $("adminTools").classList.remove("hidden"); $("bLimpa").classList.remove("hidden"); }
+  else { $("adminTools").classList.add("hidden"); $("bLimpa").classList.add("hidden"); }
+  itens = ler("fc_itens", []);
+  chat = ler("fc_chat", []);
+  lidas = chat.length;
+  aba("itens");
+  render();
+  renderChat();
+}
+function sair(){
+  isAdmin = false; usuario = "";
+  $("app").classList.add("hidden");
+  $("login").classList.remove("hidden");
+  $("boxSenha").classList.add("hidden");
+}
+
+/* ---- abas ---- */
+function aba(a){
+  abaAtual = a;
+  if (a === "itens"){ $("vItens").classList.remove("hidden"); $("vChat").classList.add("hidden"); }
+  else { $("vItens").classList.add("hidden"); $("vChat").classList.remove("hidden"); lidas = chat.length; renderChat(); }
+  $("tItens").className = "tab" + (a === "itens" ? " on" : "");
+  $("tChat").className = "tab" + (a === "chat" ? " on" : "");
+  var n = chat.length - lidas;
+  $("novas").textContent = (a !== "chat" && n > 0) ? "(" + n + ")" : "";
+}
+
+/* ---- itens ---- */
+function setFiltro(f){
+  filtro = f;
+  var ids = ["todos","perdido","encontrado"];
+  for (var i = 0; i < ids.length; i++){
+    $("c-" + ids[i]).className = "chip" + (ids[i] === f ? " on" : "");
+  }
+  render();
+}
+function reduzirFoto(file, cb){
+  if (!file){ cb(""); return; }
+  var r = new FileReader();
+  r.onerror = function(){ cb(""); };
+  r.onload = function(){
+    var im = new Image();
+    im.onerror = function(){ cb(""); };
+    im.onload = function(){
+      var s = Math.min(1, 500 / Math.max(im.width, im.height));
+      var c = document.createElement("canvas");
+      c.width = im.width * s; c.height = im.height * s;
+      c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+      cb(c.toDataURL("image/jpeg", 0.7));
+    };
+    im.src = r.result;
+  };
+  r.readAsDataURL(file);
+}
+function adicionar(){
+  var nome = $("fNome").value.replace(/^\s+|\s+$/g, "");
+  if (!nome){ toast("Informe o nome do item"); return; }
+  reduzirFoto($("fFoto").files[0], function(foto){
+    itens.unshift({
+      id: Date.now(), nome: nome, cat: $("fCat").value,
+      local: $("fLocal").value, data: $("fData").value,
+      contato: $("fContato").value, desc: $("fDesc").value,
+      foto: foto, autor: usuario, status: "perdido"
+    });
+    if (gravar("fc_itens", itens)) toast("Item registrado!");
+    else toast("Sem espaço para salvar. Tente sem foto.");
+    var campos = ["fNome","fLocal","fData","fContato","fDesc","fFoto"];
+    for (var i = 0; i < campos.length; i++) $(campos[i]).value = "";
+    render();
+  });
+}
+function mudar(id, st){
+  for (var i = 0; i < itens.length; i++){
+    if (itens[i].id === id){ itens[i].status = st; break; }
+  }
+  gravar("fc_itens", itens); render();
+  toast(st === "encontrado" ? "Marcado como encontrado!" : "Voltou para perdido");
+}
+function apagar(id){
+  if (!confirm("Excluir este item?")) return;
+  itens = itens.filter(function(x){ return x.id !== id; });
+  gravar("fc_itens", itens); render(); toast("Item excluído");
+}
+function perguntar(id){
+  for (var i = 0; i < itens.length; i++){
+    if (itens[i].id === id){
+      aba("chat");
+      $("cTxt").value = 'Sobre o item "' + itens[i].nome + '": ';
+      $("cTxt").focus();
+      return;
+    }
+  }
+}
+function exportar(){
+  var b = new Blob([JSON.stringify({itens: itens, chat: chat}, null, 2)], {type: "application/json"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(b); a.download = "findceemti-dados.json"; a.click();
+}
+function render(){
+  var q = $("busca").value.toLowerCase(), cat = $("fCatFiltro").value;
+  var enc = itens.filter(function(i){ return i.status === "encontrado"; }).length;
+  $("sT").textContent = itens.length;
+  $("sE").textContent = enc;
+  $("sP").textContent = itens.length - enc;
+  var l = itens.filter(function(i){
+    var texto = (i.nome + " " + i.local + " " + i.desc + " " + i.contato).toLowerCase();
+    return (filtro === "todos" || i.status === filtro) && (!cat || i.cat === cat) && (!q || texto.indexOf(q) > -1);
+  });
+  if (!l.length){ $("lista").innerHTML = '<div class="empty">🔍 Nenhum item por aqui.</div>'; return; }
+  $("lista").innerHTML = l.map(function(i){
+    var a = i.status === "encontrado", adm = "";
+    if (isAdmin){
+      adm = (a ? '<button type="button" class="b2" onclick="mudar(' + i.id + ',\'perdido\')">↩ Desfazer</button>'
+               : '<button type="button" class="b1" onclick="mudar(' + i.id + ',\'encontrado\')">✔ Encontrado</button>')
+          + '<button type="button" class="b4" style="flex:0" onclick="apagar(' + i.id + ')">🗑</button>';
+    }
+    return '<div class="item' + (a ? " enc" : "") + '">'
+      + (i.foto ? '<img src="' + i.foto + '" alt="Foto">' : "")
+      + '<div class="ib">'
+      + '<div class="it"><h3>' + esc(i.nome) + '</h3><span class="badge ' + (a ? "be" : "bp") + '">' + (a ? "Encontrado" : "Perdido") + '</span></div>'
+      + '<span class="cat">' + esc(i.cat || "Outros") + '</span>'
+      + '<div class="info">'
+      + '<div><b>📍 Local:</b> ' + esc(i.local || "—") + '</div>'
+      + '<div><b>📅 Data:</b> ' + fmtData(i.data) + '</div>'
+      + '<div><b>👤 Contato:</b> ' + esc(i.contato || "—") + '</div>'
+      + (i.desc ? '<div><b>📝</b> ' + esc(i.desc) + '</div>' : "")
+      + '<div><b>Registrado por:</b> ' + esc(i.autor || "—") + '</div>'
+      + '</div>'
+      + '<div class="acts"><button type="button" class="b3" onclick="perguntar(' + i.id + ')">💬 Perguntar</button>' + adm + '</div>'
+      + '</div></div>';
+  }).join("");
+}
+
+/* ---- chat ---- */
+function renderChat(){
+  var box = $("msgs");
+  if (!chat.length){ box.innerHTML = '<div class="empty" style="border:none">💬 Nenhuma mensagem ainda. Diga olá!</div>'; return; }
+  box.innerHTML = chat.map(function(m){
+    return '<div class="msg' + (m.autor === usuario ? " me" : "") + '"><small><b class="' + (m.adm ? "adm" : "") + '">'
+      + esc(m.autor) + (m.adm ? " (admin)" : "") + '</b> · ' + esc(m.hora) + '</small>' + esc(m.txt) + '</div>';
+  }).join("");
+  box.scrollTop = box.scrollHeight;
+}
+function enviar(){
+  var t = $("cTxt").value.replace(/^\s+|\s+$/g, "");
+  if (!t) return;
+  var d = new Date();
+  var h = ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+  chat.push({id: Date.now(), autor: usuario, adm: isAdmin, txt: t, hora: h});
+  if (chat.length > 200) chat = chat.slice(-200);
+  gravar("fc_chat", chat);
+  lidas = chat.length;
+  $("cTxt").value = "";
+  renderChat();
+}
+function limparChat(){
+  if (confirm("Apagar todas as mensagens?")){ chat = []; gravar("fc_chat", chat); lidas = 0; renderChat(); }
+}
+
+/* ---- inicialização ---- */
+var opts = "";
+for (var i = 0; i < CATS.length; i++) opts += "<option>" + CATS[i] + "</option>";
+$("fCat").innerHTML = opts;
+$("fCatFiltro").innerHTML = '<option value="">Todas as categorias</option>' + opts;
+
+window.addEventListener("storage", function(e){
+  if (!usuario) return;
+  if (e.key === "fc_chat"){ chat = ler("fc_chat", []); if (abaAtual === "chat"){ lidas = chat.length; renderChat(); } else aba(abaAtual); }
+  if (e.key === "fc_itens"){ itens = ler("fc_itens", []); render(); }
+});
+
+$("okjs").textContent = "✔ Sistema carregado";
+</script>
+</body>
+</html>
